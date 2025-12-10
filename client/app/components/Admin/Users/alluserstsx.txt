@@ -1,0 +1,149 @@
+'use client'
+
+import React, { FC, useState } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import { Box, Button, Link } from "@mui/material";
+import { AiOutlineDelete, AiOutlineMail } from "react-icons/ai";
+import { FiEdit2 } from "react-icons/fi";
+import { useTheme } from "next-themes";
+import Loader from "../../Loader/Loader";
+import { useGetAllCoursesQuery } from "@/redux/features/courses/coursesApi";
+import { format } from "timeago.js";
+import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
+import { useParams } from "next/navigation";
+//import Link from "next/link";
+
+type Props = {
+    isTeam: boolean;
+};
+
+const AllUsers: FC<Props> = ({ isTeam }) => {
+    const { theme,setTheme } = useTheme();
+
+    const [active,setActive]=useState(false);
+    const { isLoading, data, error } = useGetAllUsersQuery({});
+
+    console.log("Courses API data:", data); // 🔹 Debug
+
+    const columns = [
+        { field: "id", headerName: "ID", flex: 0.5 },
+        { field: "name", headerName: "Name", flex: 0.5 },
+        { field: "email", headerName: "Email", flex: 1 },
+        { field: "role", headerName: "Role", flex: 0.5 },
+        { field: "courses", headerName: "Purchased Courses", flex: 0.5 },
+        { field: "created_at", headerName: "Joined At", flex: 0.5 },
+
+        {
+            field: "delete",
+            headerName: "Delete",
+            flex: 0.2,
+            renderCell: () => (
+                <Button>
+                    <AiOutlineDelete className="dark:text-white text-black" size={20} />
+                </Button>
+            ),
+        },
+
+        {
+            field: "email  ",
+            headerName: "Email",
+            flex: 0.2,
+            renderCell: () => (
+                <a href={'mailto:${params.row.email}'}>
+                    <AiOutlineMail className="dark:text-white text-black" size={20} />
+                </a>
+            ),
+        },
+    ];
+
+
+
+    const rows: any = [];
+
+    if (isTeam) {
+        const newData = data && data.users.filter((item: any) => item.role === "admin");
+
+        newData &&
+            newData.forEach((item: any) => {
+                rows.push({
+                    id: item._id,
+                    name: item.name,
+                    email: item.email,
+                    role: item.role,
+                    courses: item.courses.length,
+                    created_at: format(item.createdAt),
+                });
+            });
+    } else {
+        data &&
+            data.users.forEach((item: any) => {
+                rows.push({
+                    id: item._id,
+                    name: item.name,
+                    email: item.email,
+                    role: item.role,
+                    courses: item.courses.length,
+                    created_at: format(item.createdAt),
+                });
+            });
+    }
+
+
+    return (
+        <div className="mt-[120px]">
+            {isLoading ? (
+                <Loader />
+            ) : (
+                <Box m="20px">
+                    <div className="flex justify-start">
+                        <div
+                            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" onClick={()=>setActive(!active)}
+                        >
+                            Add New Member
+                        </div>
+                    </div>
+
+
+
+                    <Box
+                        m="40px 0 0"
+                        height="80vh"
+                        sx={{
+                            border: "none",
+                            outline: "none",
+                            "& .MuiDataGrid-columnHeaders": {
+                                backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                                color: theme === "dark" ? "#fff" : "#000",
+                            },
+                            "& .MuiDataGrid-virtualScroller": {
+                                backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
+                            },
+                            "& .MuiDataGrid-row": {
+                                color: theme === "dark" ? "#fff" : "#000",
+                                borderBottom:
+                                    theme === "dark" ? "1px solid #ffffff30" : "1px solid #ccc",
+                            },
+                            "& .MuiCheckbox-root": {
+                                color: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                            },
+                            "& .MuiDataGrid-footerContainer": {
+                                backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
+                                borderTop: "none",
+                                "& .MuiTablePagination-root": { color: theme === "dark" ? "#fff" : "#000" },
+                                "& .MuiTablePagination-caption": { color: theme === "dark" ? "#fff" : "#000" },
+                                "& .MuiTablePagination-selectLabel": { color: theme === "dark" ? "#fff" : "#000" },
+                                "& .MuiTablePagination-select": { color: theme === "dark" ? "#fff" : "#000" },
+                                "& .MuiTablePagination-actions button": { color: theme === "dark" ? "#fff" : "#000" },
+                                "& .MuiTablePagination-displayedRows": { color: theme === "dark" ? "#fff" : "#000" },
+                            },
+                        }}
+                    >
+                        <DataGrid checkboxSelection rows={rows} columns={columns} />
+                    </Box>
+                </Box>
+            )}
+        </div>
+    );
+};
+
+export default AllUsers;
