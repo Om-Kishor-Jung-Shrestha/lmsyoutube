@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Confirmation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      height: 100vh;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #4f5ef1;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      color: #ffffff;
+    }
+    .message {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+      padding-top: 50px;
+    }
+    .message-sm {
+      text-align: center;
+    }
+    .course-info h4 {
+      text-align: center;
+    }
+    table {
+      width: 90%;
+      margin: 10px auto;
+      border-collapse: collapse;
+    }
+    .first-td, .second-td, .col-2 {
+      padding: 8px;
+    }
+    .table-row {
+      border-top: 1px solid #00000029;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="message-sm">
+      <h1>Your ELearning order is confirmed!</h1>
+      <p>And we're just as excited as you are.</p>
+    </div>
+
+    <div class="course-info">
+      <h4>Here's what you ordered:</h4>
+
+      <table style="border-bottom: 1px solid #0000002f;">
+        <tr>
+          <td>Order #: <%= order._id %></td>
+          <td>Order Date: <%= order.date %></td>
+        </tr>
+      </table>
+
+      <table>
+        <tr>
+          <td class="first-td">Item</td>
+          <td class="first-td">Qty</td>
+          <td class="first-td">Cost</td>
+        </tr>
+      </table>
+
+      <table>
+        <tr>
+          <td class="second-td"><%= order.name %></td>
+          <td class="second-td">1</td>
+          <td class="second-td">$<%= order.price %></td>
+        </tr>
+      </table>
+
+      <table class="table-row">
+        <tr>
+          <td class="col-2">Subtotal:</td>
+          <td class="col-2">$<%= order.price %></td>
+        </tr>
+      </table>
+
+      <table class="table-row" style="margin-top: -20px;">
+        <tr>
+          <td class="col-2">Total:</td>
+          <td class="col-2">$<%= order.price %></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="footer">
+      <p>
+        If you have any questions, please contact our support team at 
+        <a href="mailto:support@becodemy.com">support@becodemy.com</a>
+      </p>
+      <p>&copy; 2023 Elearning. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

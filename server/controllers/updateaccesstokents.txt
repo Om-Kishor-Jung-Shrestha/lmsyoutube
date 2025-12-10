@@ -1,0 +1,75 @@
+// update access token
+export const updateAccessToken = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refresh_token = req.cookies.refresh_token as string;
+
+      const decoded = jwt.verify(
+        refresh_token,
+        process.env.REFRESH_TOKEN_SECRET as string
+      ) as JwtPayload;
+
+      const message = "Could not refresh token";
+
+      if (!decoded) {
+        return next(new ErrorHandler(message, 400));
+      }
+
+      const session = await redis.get(decoded.id as string);
+
+      if (!session) {
+        return next(new ErrorHandler('Please login to access this resource!', 400));
+      }
+
+      const user = JSON.parse(session);
+
+      // create new access token
+      const accessToken = jwt.sign(
+        { id: user._id },
+        process.env.ACCESS_TOKEN as string,
+        { expiresIn: "5m" }
+      );
+
+      // create new refresh token
+      const refreshToken = jwt.sign(
+        { id: user._id },
+        process.env.REFRESH_TOKEN as string,
+        { expiresIn: "3d" }
+      );
+
+
+      req.user = user;
+      // set cookie options
+      /*const accessTokenOptions = {
+        expires: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+        httpOnly: true,
+        sameSite: 'lax' as const,
+      };
+
+      const refreshTokenOptions = {
+        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days
+        httpOnly: true,
+        sameSite: 'lax' as const,
+      };
+*/
+      // set cookies
+      
+      res.cookie("access_token", accessToken, accessTokenOptions);
+      res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+
+      await redis.set(user._id,JSON.stringify(user),"EX",604800); // 7 days
+
+      // send response
+      /*
+      res.status(200).json({
+        status: "success",
+        accessToken,
+      });
+      */
+     next();
+
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
